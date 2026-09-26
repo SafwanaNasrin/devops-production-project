@@ -1,0 +1,69 @@
+pipeline {
+
+    agent any
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh '''
+                    python3 -m venv .jenkins-venv
+                    . .jenkins-venv/bin/activate
+
+                    pip install --upgrade pip
+                    pip install -r app/requirements.txt
+                    pip install pytest
+
+                    PYTHONPATH=. pytest -q
+                '''
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh '''
+                    docker build \
+                        -t devops-demo:${BUILD_NUMBER} \
+                        -t devops-demo:latest .
+                '''
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh '''
+                    docker compose up -d --build
+                '''
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                sh '''
+                    sleep 10
+                    curl -f http://localhost:8081/health
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '================================='
+            echo 'DEPLOYMENT SUCCESSFUL!'
+            echo '================================='
+        }
+
+        failure {
+            echo '================================='
+            echo 'PIPELINE FAILED!'
+            echo '================================='
+        }
+    }
+}
