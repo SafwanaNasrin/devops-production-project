@@ -2,7 +2,6 @@ services:
 
   blue:
     build: .
-    container_name: app_blue
     environment:
       APP_VERSION: "1.0.0"
       APP_COLOR: "blue"
@@ -11,7 +10,6 @@ services:
 
   green:
     build: .
-    container_name: app_green
     environment:
       APP_VERSION: "2.0.0"
       APP_COLOR: "green"
@@ -20,7 +18,6 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: devops_nginx
     ports:
       - "8081:80"
     volumes:
