@@ -53,7 +53,8 @@ pipeline {
     }
 }
 
-Post        success {
+Post {
+        success {
             echo '================================='
             echo 'DEPLOYMENT SUCCESSFUL!'
             echo '================================='
