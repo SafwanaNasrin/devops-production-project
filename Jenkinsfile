@@ -15,9 +15,11 @@ pipeline {
                 sh '''
                     python3 -m venv .jenkins-venv
                     . .jenkins-venv/bin/activate
+
                     pip install --upgrade pip
                     pip install -r app/requirements.txt
                     pip install pytest
+
                     PYTHONPATH=. pytest -q
                 '''
             }
@@ -42,25 +44,21 @@ pipeline {
         }
 
         stage('Health Check') {
-    steps {
-        sh '''
-            sleep 10
+            steps {
+                sh '''
+                    sleep 10
 
-            docker ps
-
-            docker inspect \
-                --format='{{.State.Status}}' \
-                devops-production-pipeline-nginx-1
-
-            docker run --rm \
-                --network devops-production-pipeline_default \
-                curlimages/curl:latest \
-                -f http://nginx/health
-        '''
+                    docker run --rm \
+                        --network devops-production-pipeline_default \
+                        curlimages/curl:latest \
+                        -f http://nginx/health
+                '''
+            }
+        }
     }
-}
 
     post {
+
         success {
             echo '================================='
             echo 'DEPLOYMENT SUCCESSFUL!'
@@ -72,5 +70,7 @@ pipeline {
             echo 'PIPELINE FAILED!'
             echo '================================='
         }
+
     }
+
 }
