@@ -44,21 +44,19 @@ pipeline {
         }
 
         stage('Health Check') {
-            steps {
-                sh '''
-                    echo "Waiting for application..."
-                    sleep 10
+    steps {
+        sh '''
+            echo "Waiting for application..."
+            sleep 10
 
-                    echo "Checking running containers..."
-                    docker ps
+            echo "Checking Docker Compose services..."
+            docker compose ps
 
-                    echo "Checking Nginx health..."
-                    docker exec devops-production-pipeline-nginx-1 \
-                        wget -qO- http://localhost/health
-                '''
-            }
-        }
+            echo "Checking Nginx health..."
+            docker compose exec -T nginx wget -qO- http://localhost/health
+        '''
     }
+}
 
     post {
 
