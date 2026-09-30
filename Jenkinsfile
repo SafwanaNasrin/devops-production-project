@@ -42,15 +42,23 @@ pipeline {
         }
 
         stage('Health Check') {
-            steps {
-                sh '''
-                    sleep 10
-                    docker compose exec -T nginx \
-                        wget -qO- http://localhost/health
-                '''
-            }
-        }
+    steps {
+        sh '''
+            sleep 10
+
+            docker ps
+
+            docker inspect \
+                --format='{{.State.Status}}' \
+                devops-production-pipeline-nginx-1
+
+            docker run --rm \
+                --network devops-production-pipeline_default \
+                curlimages/curl:latest \
+                -f http://nginx/health
+        '''
     }
+}
 
     post {
         success {
