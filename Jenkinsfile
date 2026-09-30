@@ -35,21 +35,6 @@ pipeline {
             }
         }
 
-              stage('Health Check') {
-              steps {
-        	sh '''
-            	sleep 10
-
-            docker inspect \
-                --format='{{.State.Status}}' \
-                devops-production-pipeline-nginx-1
-
-            docker exec \
-                devops-production-pipeline-nginx-1 \
-                wget -qO- http://app_green:5000/health
-        '''
-    }
-}
         stage('Deploy') {
             steps {
                 sh '''
@@ -58,6 +43,22 @@ pipeline {
             }
         }
 
+        stage('Health Check') {
+            steps {
+                sh '''
+                    echo "Waiting for application..."
+                    sleep 10
+
+                    echo "Checking running containers..."
+                    docker ps
+
+                    echo "Checking Nginx health..."
+                    docker exec devops-production-pipeline-nginx-1 \
+                        wget -qO- http://localhost/health
+                '''
+            }
+        }
+    }
 
     post {
 
@@ -73,6 +74,8 @@ pipeline {
             echo '================================='
         }
 
+        always {
+            echo 'Pipeline execution completed.'
+        }
     }
-
 }
