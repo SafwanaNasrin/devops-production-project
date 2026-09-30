@@ -44,17 +44,16 @@ pipeline {
         }
 
         stage('Health Check') {
-            steps {
-                sh '''
-                    sleep 10
-                    curl -f http://localhost:8081/health
-                '''
-            }
-        }
+    steps {
+        sh '''
+            sleep 10
+            docker compose exec -T nginx \
+                wget -qO- http://blue:5000/health
+        '''
     }
+}
 
-    post {
-        success {
+Post        success {
             echo '================================='
             echo 'DEPLOYMENT SUCCESSFUL!'
             echo '================================='
