@@ -15,11 +15,9 @@ pipeline {
                 sh '''
                     python3 -m venv .jenkins-venv
                     . .jenkins-venv/bin/activate
-
                     pip install --upgrade pip
                     pip install -r app/requirements.txt
                     pip install pytest
-
                     PYTHONPATH=. pytest -q
                 '''
             }
@@ -44,16 +42,17 @@ pipeline {
         }
 
         stage('Health Check') {
-    steps {
-        sh '''
-            sleep 10
-            docker compose exec -T nginx \
-                wget -qO- http://blue:5000/health
-        '''
+            steps {
+                sh '''
+                    sleep 10
+                    docker compose exec -T nginx \
+                        wget -qO- http://localhost/health
+                '''
+            }
+        }
     }
-}
 
-Post {
+    post {
         success {
             echo '================================='
             echo 'DEPLOYMENT SUCCESSFUL!'
